@@ -21,27 +21,24 @@ def get_color_map():
     return color[cIdx]
 cmap = get_color_map()/255.0
 
-def get_figure(size=512):
-    if np.array(size).size==1:
-        w,h = size,size
-    else:
-        w,h = size[0],size[1]
-    fig = plt.figure()
+def get_figure(size=512,frame_off=True,tight_layout=True):
+    if np.array(size).size==1: w,h = size,size
+    else: w,h = size[0],size[1]
+    fig = plt.figure(tight_layout=tight_layout)
     dpi = fig.get_dpi()
     fig.set_size_inches(w/dpi,h/dpi)
-    fig.set_frameon(False)
+    if frame_off: fig.set_frameon(False)
     return fig    
 
-def get_axes(size=512,fig=None,rect=[0,0,1,1]):
+def get_axes(size=512,rect=[0,0,1,1],equal_aspect=True,xlim=[0,255],ylim=[0,255],invert_yaxis=True,axis_off=True,fig=None):
     if fig is None: fig = get_figure(size)
 
     ax = fig.add_axes(rect)
-    #ax.set_frame_on(False)
-    ax.set_aspect('equal')
-    ax.set_xlim([0,255])
-    ax.set_ylim([0,255])
-    ax.invert_yaxis()
-    ax.set_axis_off()
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    if equal_aspect: ax.set_aspect('equal')
+    if invert_yaxis: ax.invert_yaxis()
+    if axis_off: ax.set_axis_off()
     
     return ax
 
@@ -208,3 +205,17 @@ def plot_door(doors, thickness, ax=None):
 
     return ax
         
+def plot_tf(x,y,color=[0.,0.,0.],thickness=2,rad2deg=True,ax=None,fig=None):
+    if fig is None: fig = get_figure((512,360),frame_off=False)
+    if ax is None: ax = fig.add_subplot()
+    if rad2deg: y = np.rad2deg(y)
+
+    ax.set_xlim([0,1])
+    ax.set_ylim([min(y),max(y)])
+    #ax.set_xticks(np.unique(x))
+    ax.set_yticks(np.unique(y))
+    x = np.array([x[(i+1)//2] for i in range(2*len(x)-2)])
+    y = np.array([y[i//2] for i in range(2*len(y)-2)])
+    ax.plot(x,y,color=color,lw=thickness)
+
+    return ax

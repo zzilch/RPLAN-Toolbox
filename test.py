@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from rplan.floorplan import Floorplan
 from rplan.align import align_fp_gt
 from rplan.decorate import get_dw
-from rplan.plot import get_figure,get_axes,plot_category,plot_boundary,plot_graph,plot_fp
+from rplan.measure import compute_tf
+from rplan.plot import get_figure,get_axes,plot_category,plot_boundary,plot_graph,plot_fp,plot_tf
 
 RPLAN_DIR = './data'
 file_path = f'{RPLAN_DIR}/0.png'
@@ -27,3 +28,7 @@ plot_fp(data['boundary'], data['boxes_aligned'][order], data['types'][order],ax=
 plot_fp(data['boundary'], data['boxes_aligned'][order], data['types'][order],data['doors'],data['windows'],ax=get_axes(fig=fig,rect=[0.5,0,0.5,0.5]))
 fig.canvas.draw()
 fig.canvas.print_figure('./output/plot.png')
+
+x,y = compute_tf(data['boundary'])
+plot_tf(x,y)
+plt.savefig('./output/tf.png')

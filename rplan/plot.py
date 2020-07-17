@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from shapely import geometry
-from descartes import PolygonPatch
-
 from .utils import room_label
 
 def get_color_map():
@@ -47,11 +45,13 @@ def get_axes(size=512,fig=None,rect=[0,0,1,1]):
     
     return ax
 
-def plot_category(category,ax=None):
+def plot_category(category,show_boundary=True,ax=None):
     if ax is None: ax = get_axes()
     img = np.ones((category.shape[0],category.shape[1],4))
     img[...,:3] = cmap[category]
     img[category==13,3] = 0
+    if not show_boundary: 
+        img[np.isin(category,[14,15])]=[1.,1.,1.,0.]
     ax.imshow(img)
     return ax
 
@@ -60,7 +60,8 @@ def plot_boundary(boundary, wall_thickness=6,ax=None):
     
     is_new = boundary[:,-1]==1
     poly_boundary = geometry.Polygon(boundary[~is_new,:2])
-    ax.add_patch(PolygonPatch(poly_boundary,fc='none',ec=cmap[14],lw=wall_thickness))
+    x,y = poly_boundary.exterior.xy
+    ax.fill(x,y,fc='none',ec=cmap[14],lw=wall_thickness,joinstyle='round')
 
     door = boundary[:2,:2]
     idx = np.argmin(np.sum(door,axis=-1), axis=0)
@@ -120,14 +121,16 @@ def plot_fp(boundary, boxes, types, doors=[], windows=[], wall_thickness=6, font
         if keep_box:
             poly[k] = geometry.box(*poly[k].bounds)
             x,y = poly[k].exterior.xy
-            ax.fill(x,y,fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness)
+            ax.fill(x,y,fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness,joinstyle='round')
         else:
             if poly[k].geom_type!='Polygon':
                 for p in poly[k]:
                     if p.geom_type!='Polygon': continue
-                    ax.add_patch(PolygonPatch(p,fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness))
+                    x,y = p.exterior.xy
+                    ax.fill(x,y,fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness,joinstyle='round')
             else:
-                ax.add_patch(PolygonPatch(poly[k],fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness))
+                x,y = poly[k].exterior.xy
+                ax.fill(x,y,fc=cmap[types[k]],ec=cmap[16],alpha=alpha,lw=wall_thickness,joinstyle='round')
 
     plot_boundary(boundary,wall_thickness,ax)
 

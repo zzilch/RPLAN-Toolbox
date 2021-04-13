@@ -101,4 +101,4 @@ top_5 = retriever.retrieve_bf(data['boundary'],k=5) # argsort
 
 ## Acknowledgement
 - [RPLAN](http://staff.ustc.edu.cn/~fuxm/projects/DeepLayout/index.html)
-- [Graph2Plan](https://github.com/jizg/Graph2plan)
+- [Graph2Plan](https://github.com/HanHan55/Graph2plan)
